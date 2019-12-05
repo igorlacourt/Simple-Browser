@@ -17,10 +17,6 @@ import android.view.MenuItem
 import java.nio.file.Files.delete
 
 
-
-
-
-
 class MainActivity : AppCompatActivity() {
     //, View.OnKeyListener {
     var tvSite: TextView? = null
@@ -51,9 +47,11 @@ class MainActivity : AppCompatActivity() {
             popup?.show()
         }
 
-        popup?.setOnMenuItemClickListener {item ->
-            when(item.itemId){
-                R.id.reload -> {refresh()}
+        popup?.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.reload -> {
+                    refresh()
+                }
                 R.id.share -> {
                     url?.let { sharePage(it) }
                 }
@@ -282,7 +280,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-//    override fun onMenuItemSelected(featureId: Int, item: MenuItem): Boolean {
+    //    override fun onMenuItemSelected(featureId: Int, item: MenuItem): Boolean {
 //        return super.onMenuItemSelected(featureId, item)
 //    }
 //
@@ -299,25 +297,19 @@ class MainActivity : AppCompatActivity() {
 //            else -> return false
 //        }
 //    }
-    private fun sharePage(url: String){
-        val share = Intent.createChooser(Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, url)
-
-            // (Optional) Here we're setting the title of the content
-            putExtra(Intent.EXTRA_TITLE, "Compartilhar")
-
-            // (Optional) Here we're passing a content URI to an image to be displayed
-//            setClipData(contentUri);
-
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        }, null)
-        startActivity(share)
-
+    private fun sharePage(url: String) {
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(
+            Intent.EXTRA_TEXT,
+            url
+        )
+        sendIntent.type = "text/plain"
+        startActivity(sendIntent)
     }
 
     private fun navigateBack() {
-        if (myWebView?.copyBackForwardList() != null){
+        if (myWebView?.copyBackForwardList() != null) {
             if (myWebView!!.copyBackForwardList().currentIndex > 0) {
                 myWebView!!.goBack()
             } else {
@@ -335,7 +327,7 @@ class MainActivity : AppCompatActivity() {
         return "http://$url"
     }
 
-    private fun checkHost(url: String){
+    private fun checkHost(url: String) {
         Log.d("link-log", "url = $url")
         Log.d("link-log", "Uri.parse(url).host = $url")
         checkHostName(url)
@@ -356,19 +348,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkHostName(url: String): String{
+    private fun checkHostName(url: String): String {
         var prefix = "http://"
         var lowerCaseUrl = url.toLowerCase()
         var result = ""
-        if(lowerCaseUrl.contains("meupag.com.br")) {
-            if(!lowerCaseUrl.contains(prefix))
+        if (lowerCaseUrl.contains("meupag.com.br")) {
+            if (!lowerCaseUrl.contains(prefix))
                 result = prefix + lowerCaseUrl
         }
-        return if(result.subSequence(0, 20).contains("http://meupag.com.br")) {
-            Log.d("link-log", "url substring = ${result.subSequence(0, 20)}" )
+        return if (result.subSequence(0, 20).contains("http://meupag.com.br")) {
+            Log.d("link-log", "url substring = ${result.subSequence(0, 20)}")
             result
-        }
-        else
+        } else
             "http://meupag.com.br/parceiros"
     }
 }
