@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity() {
                             Log.d("link-log", "complete, link = ${task.result?.link}")
                             site = task.result?.link.toString()
                             tvSite?.setText(site)
-                            site?.let { myWebView?.loadUrl(formatUrl(it)) }
+                            site?.let { myWebView?.loadUrl(it) }
                         } else {
 //                            textView.text = "complete, link IS null"
                             Log.d("link-log", "complete, link IS null")
