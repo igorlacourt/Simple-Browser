@@ -13,27 +13,53 @@ import android.net.http.SslError
 import android.os.Message
 import android.webkit.*
 import android.widget.*
+import android.view.MenuItem
+import java.nio.file.Files.delete
+
+
+
+
 
 
 class MainActivity : AppCompatActivity() {
     //, View.OnKeyListener {
     var tvSite: TextView? = null
     var myWebView: WebView? = null
-    var site: String? = null
+    var url: String? = null
     var loadingWebPage: ProgressBar? = null
     var webError: TextView? = null
-    var url: String = "meu pag"
     var backButton: ImageView? = null
+    var menuButton: ImageView? = null
+    var popup: PopupMenu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        menuButton = findViewById(R.id.web_menu_button)
         backButton = findViewById(R.id.btn_arrow)
         loadingWebPage = findViewById(R.id.loading_web_page)
         tvSite = findViewById(R.id.site_path)
         myWebView = findViewById(R.id.webview)
         myWebView?.settings?.javaScriptEnabled = true
+
+        popup = PopupMenu(this, menuButton)
+        val inflater = popup?.menuInflater
+        inflater?.inflate(R.menu.web_pop_up_menu, popup?.menu)
+
+        menuButton?.setOnClickListener {
+            popup?.show()
+        }
+
+        popup?.setOnMenuItemClickListener {item ->
+            when(item.itemId){
+                R.id.reload -> {refresh()}
+                R.id.share -> {
+                    url?.let { sharePage(it) }
+                }
+            }
+            true
+        }
 
         myWebView?.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
@@ -206,11 +232,6 @@ class MainActivity : AppCompatActivity() {
                 super.onLoadResource(view, url)
             }
         }
-        site = "https://meupag.com.br"
-
-//        event.action == KeyEvent.ACTION_DOWN &&
-
-
 
         FirebaseDynamicLinks.getInstance()
             .getDynamicLink(intent)
@@ -223,9 +244,9 @@ class MainActivity : AppCompatActivity() {
                         if (task.result?.link != null) {
 //                            textView.text = task.result?.link.toString()
                             Log.d("link-log", "complete, link = ${task.result?.link}")
-                            site = task.result?.link.toString()
-                            tvSite?.setText(site)
-                            site?.let { myWebView?.loadUrl(it) }
+                            url = task.result?.link.toString()
+                            tvSite?.text = url
+                            url?.let { myWebView?.loadUrl(it) }
                         } else {
 //                            textView.text = "complete, link IS null"
                             Log.d("link-log", "complete, link IS null")
@@ -254,6 +275,44 @@ class MainActivity : AppCompatActivity() {
 
             false
         }
+
+    }
+
+    private fun refresh() {
+
+    }
+
+//    override fun onMenuItemSelected(featureId: Int, item: MenuItem): Boolean {
+//        return super.onMenuItemSelected(featureId, item)
+//    }
+//
+//    fun onMenuItemClick(item: MenuItem): Boolean {
+//        when (item.getItemId()) {
+//            R.id.archive -> {
+//                archive(item)
+//                return true
+//            }
+//            R.id.delete -> {
+//                delete(item)
+//                return true
+//            }
+//            else -> return false
+//        }
+//    }
+    private fun sharePage(url: String){
+        val share = Intent.createChooser(Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, url)
+
+            // (Optional) Here we're setting the title of the content
+            putExtra(Intent.EXTRA_TITLE, "Compartilhar")
+
+            // (Optional) Here we're passing a content URI to an image to be displayed
+//            setClipData(contentUri);
+
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }, null)
+        startActivity(share)
 
     }
 
