@@ -6,22 +6,18 @@ import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
-import androidx.core.content.ContextCompat.startActivity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Message
 import android.webkit.*
 import android.widget.*
-import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
     //, View.OnKeyListener {
-    var siteEditText: EditText? = null
+    var tvSite: TextView? = null
     var myWebView: WebView? = null
     var site: String? = null
     var loadingWebPage: ProgressBar? = null
@@ -35,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         backButton = findViewById(R.id.btn_arrow)
         loadingWebPage = findViewById(R.id.loading_web_page)
-        siteEditText = findViewById(R.id.site_path)
+        tvSite = findViewById(R.id.site_path)
         myWebView = findViewById(R.id.webview)
         myWebView?.settings?.javaScriptEnabled = true
 
@@ -50,7 +46,7 @@ class MainActivity : AppCompatActivity() {
                 view: WebView?,
                 url: String?
             ): WebResourceResponse? {
-//                siteEditText?.setText(url)
+//                tvSite?.setText(url)
                 return super.shouldInterceptRequest(view, url)
             }
 
@@ -58,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                 view: WebView?,
                 request: WebResourceRequest?
             ): WebResourceResponse? {
-//                siteEditText?.setText(url)
+//                tvSite?.setText(url)
                 return super.shouldInterceptRequest(view, request)
             }
 
@@ -105,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 //
 //                    webError?.text = error.toString()
 //                }
-                myWebView?.loadUrl("https://www.google.com/search?q=${siteEditText?.text}")
+                myWebView?.loadUrl("https://www.google.com/search?q=${tvSite?.text}")
             }
 
             override fun onRenderProcessGone(
@@ -228,8 +224,8 @@ class MainActivity : AppCompatActivity() {
 //                            textView.text = task.result?.link.toString()
                             Log.d("link-log", "complete, link = ${task.result?.link}")
                             site = task.result?.link.toString()
-                            siteEditText?.setText(site)
-                            site?.let { loadPage(it) }
+                            tvSite?.setText(site)
+                            site?.let { myWebView?.loadUrl(formatUrl(it)) }
                         } else {
 //                            textView.text = "complete, link IS null"
                             Log.d("link-log", "complete, link IS null")
@@ -248,11 +244,11 @@ class MainActivity : AppCompatActivity() {
             navigateBack()
         }
 
-        siteEditText?.setOnKeyListener { v, keyCode, event ->
+        tvSite?.setOnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER) {
                 Log.d("link-log", "Enter Key Pressed!")
-//                loadPage(siteEditText?.text.toString())
-                myWebView?.loadUrl(formatUrl(siteEditText?.text.toString()))
+//                loadPage(tvSite?.text.toString())
+                myWebView?.loadUrl(formatUrl(tvSite?.text.toString()))
                 true
             }
 
